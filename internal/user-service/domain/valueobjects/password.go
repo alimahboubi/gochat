@@ -35,6 +35,11 @@ func (p *Password) IsExpired() bool {
 	return expireDate.After(time.Now())
 }
 
+func (p *Password) VerifiedPassword(password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(p.hash), []byte(password))
+	return err == nil
+}
+
 func NewPassword(password string) (*Password, error) {
 
 	policyErr := validatePasswordPolicy(password)

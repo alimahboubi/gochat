@@ -86,3 +86,16 @@ func TestPassword_IsExpired_WithNewPassword_ShouldReturnFalse(t *testing.T) {
 
 	assert.False(t, isExpired)
 }
+
+func TestPassword_VerifyPassword_WithIncorrectPassword_ShouldReturnFalse(t *testing.T) {
+	// Arrange
+	correctPassword := "SecurePassword123!"
+	incorrectPassword := "IncorrectPassword123!"
+	password, _ := valueobjects.NewPassword(correctPassword)
+
+	// Act
+	verified := password.VerifiedPassword(incorrectPassword)
+
+	// Assert
+	assert.False(t, verified)
+}

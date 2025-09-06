@@ -1,9 +1,8 @@
 package valueobjects
 
 import (
-	"github.com/pkg/errors"
-
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 )
 
 type UserId struct {
