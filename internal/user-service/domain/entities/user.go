@@ -19,10 +19,12 @@ type User struct {
 	isVerified bool
 	events     []events.DomainEvent
 
+	createdAt         time.Time
 	activateAt        time.Time
 	emailVerifiedAt   time.Time
 	passwordChangedAt time.Time
 	profileChangedAt  time.Time
+	lastLoginAt       time.Time
 }
 
 func NewUser(email *valueobjects.Email, password *valueobjects.Password, firstName, lastname string) (*User, error) {
@@ -38,6 +40,7 @@ func NewUser(email *valueobjects.Email, password *valueobjects.Password, firstNa
 		lastName:   lastname,
 		isActive:   false,
 		isVerified: false,
+		createdAt:  time.Now(),
 	}
 
 	userCreatedEvent := events.NewUserCreatedEvent(user.Id(), email, firstName, lastname)
@@ -147,11 +150,9 @@ func (u *User) ChangePassword(password *valueobjects.Password) error {
 }
 
 func (u *User) UpdateProfile(firstName string, lastName string) error {
-	if firstName == "" {
-		return errors.New("first name is invalid")
-	}
-	if lastName == "" {
-		return errors.New("last name is invalid")
+	err := u.validateProfileUpdate(firstName, lastName)
+	if err != nil {
+		return err
 	}
 	now := time.Now()
 	oldFirstName := u.firstName
@@ -164,4 +165,34 @@ func (u *User) UpdateProfile(firstName string, lastName string) error {
 	u.addDomainEvent(profileUpdatedEvent)
 
 	return nil
+}
+
+func (u *User) validateProfileUpdate(firstname, lastname string) error {
+	if firstname == "" {
+		return errors.New("first name is invalid")
+	}
+	if lastname == "" {
+		return errors.New("last name is invalid")
+	}
+	return nil
+}
+
+func (u *User) CreatedAt() time.Time {
+	return u.createdAt
+}
+
+func (u *User) UpdatedAt() *time.Time {
+	return &u.profileChangedAt
+}
+
+func (u *User) ActivatedAt() time.Time {
+	return u.activateAt
+}
+
+func (u *User) EmailVerifiedAt() *time.Time {
+	return &u.emailVerifiedAt
+}
+
+func (u *User) LastLoginAt() *time.Time {
+	return &u.lastLoginAt
 }
